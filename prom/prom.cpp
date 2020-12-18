@@ -134,12 +134,13 @@ int main(int argc, char *argv[])
 					int port = com.GetFirstComPort();
 					if (port != -1 && com.Open(port, 115200))
 					{
-						com.Flush();
 						std::cout << "Opened COM" << port << std::endl;
-
 						UCHAR rec;
-						com.SendByte('w');
-						while(com.ReadData(&rec, 1) == 0);
+						do
+						{
+							com.SendByte('w');
+							Sleep(500);
+						} while(com.ReadData(&rec, 1) == 0);
 						if(rec == 'W')
 						{
 							std::cout << "WRITE MODE" << std::endl;
@@ -168,7 +169,7 @@ int main(int argc, char *argv[])
 								std::cout << "Verification: " << errors << " errors" << std::endl;
 							}
 							com.Close();
-						} else std::cout << "ERROR: Can't switch programmer to WRITE mode." << std::endl;
+						} else std::cout << "ERROR: Unable to enter WRITE mode." << std::endl;
 					} else std::cout << "ERROR: Can't open COM port." << std::endl;
 					file.close();
 				} else std::cout << "ERROR: File not found." << std::endl;
@@ -180,12 +181,14 @@ int main(int argc, char *argv[])
 				int port = com.GetFirstComPort();
 				if (port != -1 && com.Open(port, 115200))
 				{
-					com.Flush();
 					std::cout << "Opened COM" << port << std::endl;
-					UCHAR rec;
-					com.SendByte('r');
-					while(com.ReadData(&rec, 1) == 0);
-					if(rec == 'R')
+					UCHAR rec;				
+					do
+					{
+						com.SendByte('r');
+						Sleep(500);
+					} while(com.ReadData(&rec, 1) == 0);
+					if (rec == 'R')
 					{
 						std::cout << "READ MODE" << std::endl;							
 						uint32_t checksum = 0;
@@ -201,7 +204,7 @@ int main(int argc, char *argv[])
 						if (file.is_open()) file.close();
 						std::cout << "EEPROM checksum = " << checksum << std::endl;
 						com.Close();
-					} else std::cout << "ERROR: Can't switch programmer to READ mode." << std::endl;						
+					} else std::cout << "ERROR: Unable to enter READ mode." << std::endl;
 				} else std::cout << "ERROR: Can't open COM port." << std::endl;
 				break;
 			}
